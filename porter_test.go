@@ -10,7 +10,7 @@ import (
 
 func TestNew(t *testing.T) {
 	message := "Filed with message"
-	e := New(message, http.StatusInternalServerError, "Unknown")
+	e := New(message, http.StatusInternalServerError)
 	if e.Error() != message {
 		t.Fatal("Wrong message")
 	}
@@ -18,7 +18,7 @@ func TestNew(t *testing.T) {
 
 func TestNewF(t *testing.T) {
 	message := "Filed with message with %s param and id: %v"
-	e := NewF(message, "SOME_CODE", "Unknown", "custom", 1)
+	e := NewF(message, "SOME_CODE",  "custom", 1)
 	if e.Error() != "Filed with message with custom param and id: 1" {
 		t.Fatal("Wrong message")
 	}
@@ -32,14 +32,11 @@ func TestNewF(t *testing.T) {
 	if e.(*PortError).Code != "SOME_CODE" {
 		t.Fatal("code is wrong")
 	}
-	if e.(*PortError).Name != "Unknown" {
-		t.Fatal("name is wrong")
-	}
 }
 
 func TestPortError_PushDetail(t *testing.T) {
 	message := "Filed with message"
-	e := New(message, http.StatusInternalServerError, "Unknown")
+	e := New(message, http.StatusInternalServerError)
 	e = e.PushDetail("New detail", "SOME_CODE", "item")
 	e = e.PushDetail("New detail 2", http.StatusBadRequest, "item second")
 	if len(e.GetDetails()) != 2 {
@@ -49,7 +46,7 @@ func TestPortError_PushDetail(t *testing.T) {
 
 func TestPortError_PopDetail(t *testing.T) {
 	message := "Filed with message"
-	e := New(message, http.StatusInternalServerError, "Unknown")
+	e := New(message, http.StatusInternalServerError)
 	e = e.PushDetail("New detail", "SOME_CODE", "item")
 	e = e.PushDetail("New detail 2", http.StatusBadRequest, "item second")
 	er := e.PopDetail()
@@ -71,7 +68,7 @@ func TestPortError_PopDetail(t *testing.T) {
 
 func TestPortError_GetDetails(t *testing.T) {
 	message := "Filed with message"
-	e := New(message, http.StatusInternalServerError, "Unknown")
+	e := New(message, http.StatusInternalServerError)
 	e = e.PushDetail("New detail", "SOME_CODE", "item")
 	e = e.PushDetail("New detail 2", http.StatusBadRequest, "item second")
 	if len(e.GetDetails()) != 2 {
@@ -81,7 +78,7 @@ func TestPortError_GetDetails(t *testing.T) {
 
 func TestPortError_FlushDetails(t *testing.T) {
 	message := "Filed with message"
-	e := New(message, http.StatusInternalServerError, "Unknown")
+	e := New(message, http.StatusInternalServerError)
 	e = e.PushDetail("New detail", "SOME_CODE", "item")
 	e = e.PushDetail("New detail 2", http.StatusBadRequest, "item second")
 	e = e.FlushDetails()
@@ -93,7 +90,7 @@ func TestPortError_FlushDetails(t *testing.T) {
 
 func TestPortError_MarshalJSON(t *testing.T) {
 	message := "Filed with message"
-	e := New(message, http.StatusInternalServerError, "Unknown")
+	e := New(message, http.StatusInternalServerError)
 	e = e.PushDetail("New detail", "SOME_CODE", "item")
 	e = e.PushDetail("", http.StatusBadRequest, "item second")
 
@@ -102,7 +99,7 @@ func TestPortError_MarshalJSON(t *testing.T) {
 		t.Fatal("Marshal error")
 	}
 
-	if fmt.Sprintf("%s", data) != `{"message":"Filed with message","code":500,"name":"Unknown","error":[{"message":"New detail","code":"SOME_CODE","name":"item"},{"code":400,"name":"item second"}]}` {
+	if fmt.Sprintf("%s", data) != `{"message":"Filed with message","code":500,"error":[{"message":"New detail","code":"SOME_CODE","name":"item"},{"code":400,"name":"item second"}]}` {
 		t.Fatal("wrong marshal")
 	}
 }
@@ -128,5 +125,34 @@ func TestPortError_UnmarshalJSON2(t *testing.T) {
 	err := json.Unmarshal(data, e)
 	if err == nil {
 		t.Fatal("Must be an error")
+	}
+}
+
+func TestNewWithName(t *testing.T) {
+	message := "Filed with message"
+	e := NewWithName(message, http.StatusInternalServerError, "Unknown")
+	if e.Error() != message {
+		t.Fatal("Wrong message")
+	}
+}
+
+func TestNewFWithName(t *testing.T) {
+	message := "Filed with message with %s param and id: %v"
+	e := NewFWithName(message, "SOME_CODE", "Unknown", "custom", 1)
+	if e.Error() != "Filed with message with custom param and id: 1" {
+		t.Fatal("Wrong message")
+	}
+	if e.GetStack() == nil {
+		t.Fatal("no stack")
+	}
+	r := reflect.TypeOf(e)
+	if r.Elem().Name() != "PortError" {
+		t.Fatal("Type is wrong")
+	}
+	if e.(*PortError).Code != "SOME_CODE" {
+		t.Fatal("code is wrong")
+	}
+	if e.(*PortError).Name != "Unknown" {
+		t.Fatal("name is wrong")
 	}
 }
