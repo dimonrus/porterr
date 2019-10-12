@@ -47,29 +47,29 @@ func (e *PortError) FlushDetails() IError {
 }
 
 // New error
-func New(message string, code interface{}) IError {
+func New(code interface{}, message string) IError {
 	return &PortError{
-		ErrorData: ErrorData{Message: message, Code: code, stack: debug.Stack()},
+		ErrorData: ErrorData{Code: code, Message: message, stack: debug.Stack()},
 	}
 }
 
 // New error
-func NewF(message string, code interface{}, args ...interface{}) IError {
+func NewF(code interface{}, message string, args ...interface{}) IError {
 	return &PortError{
-		ErrorData: ErrorData{Message: fmt.Sprintf(message, args...), Code: code, stack: debug.Stack()},
+		ErrorData: ErrorData{Code: code, Message: fmt.Sprintf(message, args...), stack: debug.Stack()},
 	}
 }
 
 // New error with name
-func NewWithName(message string, code interface{}, name string) IError {
+func NewWithName(code interface{}, name string, message string) IError {
 	return &PortError{
-		ErrorData: ErrorData{Message: message, Code: code, Name: name, stack: debug.Stack()},
+		ErrorData: ErrorData{Code: code, Name: name, Message: message, stack: debug.Stack()},
 	}
 }
 
 // New error with name
-func NewFWithName(message string, code interface{}, name string, args ...interface{}) IError {
+func NewFWithName(code interface{}, name string, message string, args ...interface{}) IError {
 	return &PortError{
-		ErrorData: ErrorData{Message: fmt.Sprintf(message, args...), Code: code, Name: name, stack: debug.Stack()},
+		ErrorData: ErrorData{Code: code, Name: name, Message: fmt.Sprintf(message, args...), stack: debug.Stack()},
 	}
 }
