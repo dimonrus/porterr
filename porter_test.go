@@ -37,8 +37,8 @@ func TestNewF(t *testing.T) {
 func TestPortError_PushDetail(t *testing.T) {
 	message := "Filed with message"
 	e := New(http.StatusInternalServerError, message)
-	e = e.PushDetail("New detail", "SOME_CODE", "item")
-	e = e.PushDetail("New detail 2", http.StatusBadRequest, "item second")
+	e = e.PushDetail("SOME_CODE", "item", "New detail")
+	e = e.PushDetail(http.StatusBadRequest, "item second", "New detail 2")
 	if len(e.GetDetails()) != 2 {
 		t.Fatal("wrong detail count")
 	}
@@ -47,8 +47,8 @@ func TestPortError_PushDetail(t *testing.T) {
 func TestPortError_PopDetail(t *testing.T) {
 	message := "Filed with message"
 	e := New(http.StatusInternalServerError, message)
-	e = e.PushDetail("New detail", "SOME_CODE", "item")
-	e = e.PushDetail("New detail 2", http.StatusBadRequest, "item second")
+	e = e.PushDetail("SOME_CODE", "item", "New detail")
+	e = e.PushDetail(http.StatusBadRequest, "item second", "New detail 2", )
 	er := e.PopDetail()
 	if er.Error() != "New detail 2" {
 		t.Fatal("wrong detail message")
@@ -69,8 +69,8 @@ func TestPortError_PopDetail(t *testing.T) {
 func TestPortError_GetDetails(t *testing.T) {
 	message := "Filed with message"
 	e := New(http.StatusInternalServerError, message)
-	e = e.PushDetail("New detail", "SOME_CODE", "item")
-	e = e.PushDetail("New detail 2", http.StatusBadRequest, "item second")
+	e = e.PushDetail("SOME_CODE", "item", "New detail")
+	e = e.PushDetail(http.StatusBadRequest, "item second", "New detail 2")
 	if len(e.GetDetails()) != 2 {
 		t.Fatal("Wrong detail count")
 	}
@@ -79,8 +79,8 @@ func TestPortError_GetDetails(t *testing.T) {
 func TestPortError_FlushDetails(t *testing.T) {
 	message := "Filed with message"
 	e := New(http.StatusInternalServerError, message)
-	e = e.PushDetail("New detail", "SOME_CODE", "item")
-	e = e.PushDetail("New detail 2", http.StatusBadRequest, "item second")
+	e = e.PushDetail("SOME_CODE", "item", "New detail")
+	e = e.PushDetail(http.StatusBadRequest, "item second", "New detail 2")
 	e = e.FlushDetails()
 	if len(e.GetDetails()) != 0 {
 		t.Fatal("Flush is not works")
@@ -90,8 +90,8 @@ func TestPortError_FlushDetails(t *testing.T) {
 func TestPortError_MarshalJSON(t *testing.T) {
 	message := "Filed with message"
 	e := New(http.StatusInternalServerError, message)
-	e = e.PushDetail("New detail", "SOME_CODE", "item")
-	e = e.PushDetail("", http.StatusBadRequest, "item second")
+	e = e.PushDetail("SOME_CODE", "item", "New detail")
+	e = e.PushDetail(http.StatusBadRequest, "item second", "")
 
 	data, err := json.Marshal(e)
 	if err != nil {

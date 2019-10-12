@@ -19,7 +19,7 @@ type IError interface {
 	Error() string                                                   // Error interface std
 	GetStack() []byte                                                // Get stacktrace
 	GetDetails() []IError                                            // Get error details
-	PushDetail(message string, code interface{}, name string) IError // Add error detail
+	PushDetail(code interface{}, name string, message string) IError // Add error detail
 	PopDetail() IError                                               // Get detail from
 	FlushDetails() IError                                            // Reset all details
 }

@@ -25,8 +25,8 @@ func (e *PortError) GetDetails() []IError {
 }
 
 // Interface error push detail
-func (e *PortError) PushDetail(message string, code interface{}, name string) IError {
-	e.details = append(e.details, ErrorData{Message: message, Code: code, Name: name, stack: debug.Stack()})
+func (e *PortError) PushDetail(code interface{}, name string, message string) IError {
+	e.details = append(e.details, ErrorData{Code: code, Name: name, Message: message, stack: debug.Stack()})
 	return e
 }
 
