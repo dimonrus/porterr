@@ -20,7 +20,7 @@ func (e *PortError) GetStack() []byte {
 func (e *PortError) GetDetails() []IError {
 	var items []IError
 	for i := range e.details {
-		items = append(items, &PortError{ErrorData: ErrorData{Message: e.details[i].Message, Code: e.details[i].Code, Name: e.details[i].Name, stack: e.details[i].stack}})
+		items = append(items, &PortError{httpCode: e.httpCode, ErrorData: ErrorData{Message: e.details[i].Message, Code: e.details[i].Code, Name: e.details[i].Name, stack: e.details[i].stack}})
 	}
 	return items
 }
