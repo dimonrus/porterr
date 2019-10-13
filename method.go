@@ -2,6 +2,7 @@ package porterr
 
 import (
 	"fmt"
+	"net/http"
 	"runtime/debug"
 )
 
@@ -60,6 +61,7 @@ func (e *PortError) GetHTTP() int {
 // New error
 func New(code interface{}, message string) IError {
 	return &PortError{
+		httpCode:http.StatusInternalServerError,
 		ErrorData: ErrorData{Code: code, Message: message, stack: debug.Stack()},
 	}
 }
@@ -67,6 +69,7 @@ func New(code interface{}, message string) IError {
 // New error
 func NewF(code interface{}, message string, args ...interface{}) IError {
 	return &PortError{
+		httpCode:http.StatusInternalServerError,
 		ErrorData: ErrorData{Code: code, Message: fmt.Sprintf(message, args...), stack: debug.Stack()},
 	}
 }
@@ -74,6 +77,7 @@ func NewF(code interface{}, message string, args ...interface{}) IError {
 // New error with name
 func NewWithName(code interface{}, name string, message string) IError {
 	return &PortError{
+		httpCode:http.StatusInternalServerError,
 		ErrorData: ErrorData{Code: code, Name: name, Message: message, stack: debug.Stack()},
 	}
 }
@@ -81,6 +85,7 @@ func NewWithName(code interface{}, name string, message string) IError {
 // New error with name
 func NewFWithName(code interface{}, name string, message string, args ...interface{}) IError {
 	return &PortError{
+		httpCode:http.StatusInternalServerError,
 		ErrorData: ErrorData{Code: code, Name: name, Message: fmt.Sprintf(message, args...), stack: debug.Stack()},
 	}
 }
