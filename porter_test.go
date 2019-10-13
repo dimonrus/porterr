@@ -98,7 +98,7 @@ func TestPortError_MarshalJSON(t *testing.T) {
 		t.Fatal("Marshal error")
 	}
 
-	if fmt.Sprintf("%s", data) != `{"message":"Filed with message","code":"PORTABLE_ERROR_SYSTEM","error":[{"message":"New detail","code":"SOME_CODE","name":"item"},{"code":400,"name":"item second"}]}` {
+	if fmt.Sprintf("%s", data) != `{"message":"Filed with message","code":"PORTABLE_ERROR_SYSTEM","data":[{"message":"New detail","code":"SOME_CODE","name":"item"},{"code":400,"name":"item second"}]}` {
 		t.Fatal("wrong marshal")
 	}
 
@@ -108,7 +108,7 @@ func TestPortError_MarshalJSON(t *testing.T) {
 }
 
 func TestPortError_UnmarshalJSON(t *testing.T) {
-	data := []byte(`{"message":"Filed with message","code":500,"name":"Unknown","error":[{"message":"New detail","code":"SOME_CODE","name":"item"},{"message":"New detail 2","code":400,"name":"item second"}]}`)
+	data := []byte(`{"message":"Filed with message","code":500,"name":"Unknown","data":[{"message":"New detail","code":"SOME_CODE","name":"item"},{"message":"New detail 2","code":400,"name":"item second"}]}`)
 	e := &PortError{}
 	err := json.Unmarshal(data, e)
 	if err != nil {
