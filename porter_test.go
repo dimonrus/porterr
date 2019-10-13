@@ -89,7 +89,7 @@ func TestPortError_FlushDetails(t *testing.T) {
 
 func TestPortError_MarshalJSON(t *testing.T) {
 	message := "Filed with message"
-	e := New(http.StatusInternalServerError, message)
+	e := New(PortErrorSystem, message).HTTP(http.StatusInternalServerError)
 	e = e.PushDetail("SOME_CODE", "item", "New detail")
 	e = e.PushDetail(http.StatusBadRequest, "item second", "")
 
@@ -98,8 +98,12 @@ func TestPortError_MarshalJSON(t *testing.T) {
 		t.Fatal("Marshal error")
 	}
 
-	if fmt.Sprintf("%s", data) != `{"message":"Filed with message","code":500,"error":[{"message":"New detail","code":"SOME_CODE","name":"item"},{"code":400,"name":"item second"}]}` {
+	if fmt.Sprintf("%s", data) != `{"message":"Filed with message","code":"PORTABLE_ERROR_SYSTEM","error":[{"message":"New detail","code":"SOME_CODE","name":"item"},{"code":400,"name":"item second"}]}` {
 		t.Fatal("wrong marshal")
+	}
+
+	if e.GetHTTP() != 500 {
+		t.Fatal("wrong http code")
 	}
 }
 

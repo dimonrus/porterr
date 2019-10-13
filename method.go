@@ -46,6 +46,17 @@ func (e *PortError) FlushDetails() IError {
 	return e
 }
 
+// Set HTTP
+func (e *PortError) HTTP(httpCode int) IError {
+	e.httpCode = httpCode
+	return e
+}
+
+// Get HTTP Code
+func (e *PortError) GetHTTP() int {
+	return e.httpCode
+}
+
 // New error
 func New(code interface{}, message string) IError {
 	return &PortError{
