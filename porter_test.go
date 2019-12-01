@@ -29,8 +29,12 @@ func TestNewF(t *testing.T) {
 	if r.Elem().Name() != "PortError" {
 		t.Fatal("Type is wrong")
 	}
-	if e.(*PortError).Code != "SOME_CODE" {
+	if e.GetCode() != "SOME_CODE" {
 		t.Fatal("code is wrong")
+	}
+	e = e.Code("New_Code")
+	if e.GetCode() != "New_Code" {
+		t.Fatal("Code is wrong")
 	}
 }
 
@@ -53,7 +57,7 @@ func TestPortError_PopDetail(t *testing.T) {
 	if er.Error() != "New detail 2" {
 		t.Fatal("wrong detail message")
 	}
-	if er.(*PortError).Code != http.StatusBadRequest {
+	if er.GetCode() != http.StatusBadRequest {
 		t.Fatal("code is not works")
 	}
 	if len(e.GetDetails()) != 1 {
@@ -152,7 +156,7 @@ func TestNewFWithName(t *testing.T) {
 	if r.Elem().Name() != "PortError" {
 		t.Fatal("Type is wrong")
 	}
-	if e.(*PortError).Code != "SOME_CODE" {
+	if e.GetCode() != "SOME_CODE" {
 		t.Fatal("code is wrong")
 	}
 	if e.(*PortError).Name != "Unknown" {

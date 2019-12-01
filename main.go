@@ -25,4 +25,6 @@ type IError interface {
 	FlushDetails() IError                                            // Reset all details
 	HTTP(httpCode int) IError                                        // Set HTTP code
 	GetHTTP() int                                                    // Get http code
+	Code(code interface{}) IError                                    // Set error code
+	GetCode() interface{}                                            // Get error code
 }

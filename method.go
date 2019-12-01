@@ -58,6 +58,17 @@ func (e *PortError) GetHTTP() int {
 	return e.httpCode
 }
 
+// Set Error Code
+func (e *PortError) Code(code interface{}) IError {
+	e.ErrorData.Code = code
+	return e
+}
+
+// Get Error Code
+func (e *PortError) GetCode() interface{} {
+	return e.ErrorData.Code
+}
+
 // New error
 func New(code interface{}, message string) IError {
 	return &PortError{
