@@ -41,6 +41,18 @@ func (e *PortError) PopDetail() IError {
 	return nil
 }
 
+// Merge detail from other errors
+func (e *PortError) MergeDetails(error ... IError) IError {
+	for _, v := range error {
+		if v == nil {
+			continue
+		}
+		detail := v.(*PortError)
+		e.details = append(e.details, detail.details...)
+	}
+	return e
+}
+
 // Flush detail
 func (e *PortError) FlushDetails() IError {
 	e.details = make([]ErrorData, 0)

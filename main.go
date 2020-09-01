@@ -22,6 +22,7 @@ type IError interface {
 	GetDetails() []IError                                            // Get error details
 	PushDetail(code interface{}, name string, message string) IError // Add error detail
 	PopDetail() IError                                               // Get detail from
+	MergeDetails(e ... IError) IError								 // Merge detail to error
 	FlushDetails() IError                                            // Reset all details
 	HTTP(httpCode int) IError                                        // Set HTTP code
 	GetHTTP() int                                                    // Get http code

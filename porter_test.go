@@ -163,3 +163,45 @@ func TestNewFWithName(t *testing.T) {
 		t.Fatal("name is wrong")
 	}
 }
+
+func TestPortError_MergeDetails(t *testing.T) {
+	data := []byte(`{"message":"Filed with message","code":500,"name":"Unknown","data":[{"message":"New detail","code":"SOME_CODE","name":"item"},{"message":"New detail 2","code":400,"name":"item second"}]}`)
+	e := New(PortErrorIO, "Filed with message")
+	err := json.Unmarshal(data, e)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if e.Error() != "Filed with message" {
+		t.Fatal("Wrong unmarshal")
+	}
+	if len(e.GetDetails()) != 2 {
+		t.Fatal("wrong unmarshal details count")
+	}
+
+	data = []byte(`{"message":"Filed with message","code":500,"name":"Unknown","data":[{"message":"New detail","code":"SOME_CODE_2","name":"item"}]}`)
+	e2 := New(PortErrorIO, "Filed with message")
+	err = json.Unmarshal(data, e2)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	data = []byte(`{"message":"Filed with message","code":500,"name":"Unknown"}`)
+	e3 := New(PortErrorIO, "Filed with message")
+	err = json.Unmarshal(data, e3)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	var e4 IError
+
+	e = e.MergeDetails(e2, e3, e4)
+
+	fmt.Println(len(e.GetDetails()))
+
+	d, err := json.Marshal(e)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	fmt.Printf("%s", d)
+}
