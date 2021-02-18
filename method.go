@@ -59,6 +59,14 @@ func (e *PortError) FlushDetails() IError {
 	return e
 }
 
+// Return nil when error does not contain details
+func (e *PortError) IfDetails() IError    {
+	if len(e.details) > 0 {
+		return e
+	}
+	return nil
+}
+
 // Set HTTP
 func (e *PortError) HTTP(httpCode int) IError {
 	e.httpCode = httpCode

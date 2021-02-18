@@ -22,10 +22,11 @@ type IError interface {
 	GetDetails() []IError                                            // Get error details
 	PushDetail(code interface{}, name string, message string) IError // Add error detail
 	PopDetail() IError                                               // Get detail from
-	MergeDetails(e ... IError) IError								 // Merge detail to error
+	MergeDetails(e ...IError) IError                                 // Merge detail to error
 	FlushDetails() IError                                            // Reset all details
 	HTTP(httpCode int) IError                                        // Set HTTP code
 	GetHTTP() int                                                    // Get http code
 	Code(code interface{}) IError                                    // Set error code
 	GetCode() interface{}                                            // Get error code
+	IfDetails() IError                                               // Return error if error has details else nil
 }

@@ -205,3 +205,17 @@ func TestPortError_MergeDetails(t *testing.T) {
 
 	fmt.Printf("%s", d)
 }
+
+func TestPortError_IfDetails(t *testing.T) {
+	e := New(PortErrorSearch, "some test error")
+	e = e.PushDetail(PortErrorIO, "name", "try it")
+
+	if e.IfDetails() == nil {
+		t.Fatal("if detail isn work properly")
+	}
+
+	e = New(PortErrorSearch, "some test error")
+	if e.IfDetails() != nil {
+		t.Fatal("if detail isn work properly. nil expected")
+	}
+}
