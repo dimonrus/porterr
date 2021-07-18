@@ -22,9 +22,6 @@ func TestNewF(t *testing.T) {
 	if e.Error() != "Filed with message with custom param and id: 1" {
 		t.Fatal("Wrong message")
 	}
-	if e.GetStack() == nil {
-		t.Fatal("no stack")
-	}
 	r := reflect.TypeOf(e)
 	if r.Elem().Name() != "PortError" {
 		t.Fatal("Type is wrong")
@@ -148,9 +145,6 @@ func TestNewFWithName(t *testing.T) {
 	e := NewFWithName("SOME_CODE", "Unknown", message, "custom", 1)
 	if e.Error() != "Filed with message with custom param and id: 1" {
 		t.Fatal("Wrong message")
-	}
-	if e.GetStack() == nil {
-		t.Fatal("no stack")
 	}
 	r := reflect.TypeOf(e)
 	if r.Elem().Name() != "PortError" {

@@ -3,7 +3,6 @@ package porterr
 import (
 	"fmt"
 	"net/http"
-	"runtime/debug"
 )
 
 // Interface error method
@@ -11,23 +10,18 @@ func (e *PortError) Error() string {
 	return e.ErrorData.Message
 }
 
-// Interface error get stack
-func (e *PortError) GetStack() []byte {
-	return e.stack
-}
-
 // Interface error get details
 func (e *PortError) GetDetails() []IError {
 	var items []IError
 	for i := range e.details {
-		items = append(items, &PortError{httpCode: e.httpCode, ErrorData: ErrorData{Message: e.details[i].Message, Code: e.details[i].Code, Name: e.details[i].Name, stack: e.details[i].stack}})
+		items = append(items, &PortError{httpCode: e.httpCode, ErrorData: ErrorData{Message: e.details[i].Message, Code: e.details[i].Code, Name: e.details[i].Name}})
 	}
 	return items
 }
 
 // Interface error push detail
 func (e *PortError) PushDetail(code interface{}, name string, message string) IError {
-	e.details = append(e.details, ErrorData{Code: code, Name: name, Message: message, stack: debug.Stack()})
+	e.details = append(e.details, ErrorData{Code: code, Name: name, Message: message})
 	return e
 }
 
@@ -93,7 +87,7 @@ func (e *PortError) GetCode() interface{} {
 func New(code interface{}, message string) IError {
 	return &PortError{
 		httpCode:http.StatusInternalServerError,
-		ErrorData: ErrorData{Code: code, Message: message, stack: debug.Stack()},
+		ErrorData: ErrorData{Code: code, Message: message},
 	}
 }
 
@@ -101,7 +95,7 @@ func New(code interface{}, message string) IError {
 func NewF(code interface{}, message string, args ...interface{}) IError {
 	return &PortError{
 		httpCode:http.StatusInternalServerError,
-		ErrorData: ErrorData{Code: code, Message: fmt.Sprintf(message, args...), stack: debug.Stack()},
+		ErrorData: ErrorData{Code: code, Message: fmt.Sprintf(message, args...)},
 	}
 }
 
@@ -109,7 +103,7 @@ func NewF(code interface{}, message string, args ...interface{}) IError {
 func NewWithName(code interface{}, name string, message string) IError {
 	return &PortError{
 		httpCode:http.StatusInternalServerError,
-		ErrorData: ErrorData{Code: code, Name: name, Message: message, stack: debug.Stack()},
+		ErrorData: ErrorData{Code: code, Name: name, Message: message},
 	}
 }
 
@@ -117,6 +111,6 @@ func NewWithName(code interface{}, name string, message string) IError {
 func NewFWithName(code interface{}, name string, message string, args ...interface{}) IError {
 	return &PortError{
 		httpCode:http.StatusInternalServerError,
-		ErrorData: ErrorData{Code: code, Name: name, Message: fmt.Sprintf(message, args...), stack: debug.Stack()},
+		ErrorData: ErrorData{Code: code, Name: name, Message: fmt.Sprintf(message, args...)},
 	}
 }
