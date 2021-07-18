@@ -339,6 +339,9 @@ func TestParseValidTag(t *testing.T) {
 }
 
 func BenchmarkParseValidTag(b *testing.B) {
+	rules := ParseValidTag("exp~[0-5]+;range~1-50;enum~5,10,15,20,25")
+	b.Log(rules)
+	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		ParseValidTag("exp~[0-5]+;range~1-50;enum~5,10,15,20,25")
 	}

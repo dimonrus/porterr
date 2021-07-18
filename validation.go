@@ -97,9 +97,7 @@ func ParseValidTag(validTag string) []ValidationRule {
 		return nil
 	}
 	var result = make([]ValidationRule, 4)
-	if validTag[len(validTag)-1] != ';' {
-		validTag += string(';')
-	}
+
 	var ruleCount int
 	var nameIndexStart, nameIndexEnd int
 	var argIndexStart int
@@ -120,6 +118,13 @@ func ParseValidTag(validTag string) []ValidationRule {
 			nameIndexStart = i + 1
 		}
 	}
+
+	if validTag[len(validTag)-1] != ';' {
+		result[ruleCount].Name = validTag[nameIndexStart:nameIndexEnd]
+		result[ruleCount].Args = []string{validTag[argIndexStart:]}
+		ruleCount++
+	}
+
 	return result[:ruleCount]
 }
 
