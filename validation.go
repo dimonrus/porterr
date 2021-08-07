@@ -23,6 +23,10 @@ var basicValidationRules = map[string]ValidationCallback{
 	"required": IsRequiredValid,
 	// Enum validator
 	"enum": IsEnumValid,
+	// Range validation
+	"range": IsRangeValid,
+	// Regular expression validation
+	"rx": IsRegularValid,
 }
 
 // Will be used in validation method
@@ -52,6 +56,11 @@ func ValidateStruct(v interface{}) IError {
 		te = te.Elem()
 	}
 
+	if ve.Kind() != reflect.Struct {
+		e = e.PushDetail(PortErrorParam, "type", "Type struct required. Type " + ve.Kind().String() + " received")
+		return e
+	}
+
 	var fieldName string
 	var rules []ValidationRule
 
@@ -71,10 +80,8 @@ func ValidateStruct(v interface{}) IError {
 				}
 			}
 		}
-		jsonTag := t.Tag.Get("json")
-		if jsonTag != "" {
-			fieldName = jsonTag
-		} else {
+		fieldName = t.Tag.Get("json")
+		if fieldName == "" {
 			fieldName = t.Name
 		}
 		rules = ParseValidTag(t.Tag.Get("valid"))
@@ -97,31 +104,38 @@ func ParseValidTag(validTag string) []ValidationRule {
 		return nil
 	}
 	var result = make([]ValidationRule, 4)
-
 	var ruleCount int
-	var nameIndexStart, nameIndexEnd int
-	var argIndexStart int
+	var indexStart, i int
 
-	for i, symbol := range validTag {
-		if symbol == '~' {
-			nameIndexEnd = i
-			argIndexStart = i + 1
+	for {
+		if validTag[i] == '~' {
 			if ruleCount == len(result) {
 				result = append(result, make([]ValidationRule, 4)...)
 			}
-			continue
+			result[ruleCount].Name = validTag[indexStart:i]
+			i++
+			indexStart = i
+			for {
+				if validTag[i] == ';' {
+					result[ruleCount].Args = []string{validTag[indexStart:i]}
+					ruleCount++
+					indexStart = i + 1
+					break
+				}
+				i++
+				if i >= len(validTag) {
+					break
+				}
+			}
 		}
-		if symbol == ';' {
-			result[ruleCount].Name = validTag[nameIndexStart:nameIndexEnd]
-			result[ruleCount].Args = []string{validTag[argIndexStart:i]}
-			ruleCount++
-			nameIndexStart = i + 1
+		i++
+		if i >= len(validTag) {
+			break
 		}
 	}
 
 	if validTag[len(validTag)-1] != ';' {
-		result[ruleCount].Name = validTag[nameIndexStart:nameIndexEnd]
-		result[ruleCount].Args = []string{validTag[argIndexStart:]}
+		result[ruleCount].Args = []string{validTag[indexStart:]}
 		ruleCount++
 	}
 

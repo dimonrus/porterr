@@ -13,14 +13,14 @@ type AliasOnTypeString string
 
 type Nested struct {
 	Foo int32 `json:"foo"`
-	Bar *bool  `json:"bar" valid:"required"`
+	Bar *bool `json:"bar" valid:"required"`
 }
 
 type TestValidationStruct struct {
 	Name      string            `json:"name" valid:"required;exp~[a-z]+"`
-	Number    int               `json:"number" valid:"exp~[0-5]+;range~[1-50];enum~[5,10,15,20,25]"`
+	Number    int               `json:"number" valid:"exp~[0-5]+;range~1:50;enum~[5,10,15,20,25]"`
 	IsTrue    *bool             `json:"isTrue"`
-	Complex   *ComplexStruct     `json:"complex" valid:"required"`
+	Complex   *ComplexStruct    `json:"complex" valid:"required"`
 	Sl        []int64           `json:"sl"`
 	SuperName AliasOnTypeString `json:"superName" valid:"required"`
 	Nested    Nested            `json:"nested"`
@@ -263,13 +263,13 @@ func TestValidationRequired(t *testing.T) {
 	}
 	close(ch2)
 
-	var st = struct{a int}{}
+	var st = struct{ a int }{}
 	v = reflect.ValueOf(st)
 	if IsRequiredValid(v) {
 		t.Fatal("Must be invalid")
 	}
 
-	st = struct{a int}{a: 1}
+	st = struct{ a int }{a: 1}
 	v = reflect.ValueOf(st)
 	if !IsRequiredValid(v) {
 		t.Fatal("Must be valid")
@@ -277,10 +277,10 @@ func TestValidationRequired(t *testing.T) {
 }
 
 type TestEnumStruct struct {
-	Foo string `json:"foo" valid:"enum~empty,base,value"`
-	Number float32 `json:"number" valid:"enum~0.1,0.5,0.9"`
-	Bar int64 `json:"bar" valid:"enum~200,500,9000,100"`
-	PNumber *int64 `json:"pNumber" valid:"enum~100,50,20,10"`
+	Foo     string  `json:"foo" valid:"enum~empty,base,value"`
+	Number  float32 `json:"number" valid:"enum~0.1,0.5,0.9"`
+	Bar     int64   `json:"bar" valid:"enum~200,500,9000,100"`
+	PNumber *int64  `json:"pNumber" valid:"enum~100,50,20,10"`
 }
 
 func TestIsEnumValid(t *testing.T) {
@@ -308,10 +308,10 @@ func BenchmarkEnumStruct(b *testing.B) {
 }
 
 type TestRequiredStruct struct {
-	Foo string `json:"foo" valid:"required"`
-	Number float32 `json:"number" valid:"required"`
-	Bar int64 `json:"bar" valid:"required"`
-	PNumber *int64 `json:"pNumber" valid:"required"`
+	Foo     string  `json:"foo" valid:"required"`
+	Number  float32 `json:"number" valid:"required"`
+	Bar     int64   `json:"bar" valid:"required"`
+	PNumber *int64  `json:"pNumber" valid:"required"`
 }
 
 func BenchmarkRequired(b *testing.B) {
@@ -334,16 +334,116 @@ func BenchmarkCheckNative(b *testing.B) {
 }
 
 func TestParseValidTag(t *testing.T) {
-	rules := ParseValidTag("exp~[0-5]+;range~1-50;enum~5,10,15,20,25")
+	rules := ParseValidTag("exp~[0-5]+;range~1:50;enum~5,10,15,20,25")
 	t.Log(rules)
 }
 
 func BenchmarkParseValidTag(b *testing.B) {
-	rules := ParseValidTag("exp~[0-5]+;range~1-50;enum~5,10,15,20,25")
+	rules := ParseValidTag("exp~[0-5]+;range~1:50;enum~5,10,15,20,25;other~cool;cool~231231")
 	b.Log(rules)
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		ParseValidTag("exp~[0-5]+;range~1-50;enum~5,10,15,20,25")
+		ParseValidTag("exp~[0-5]+;range~1:50;enum~5,10,15,20,25")
+	}
+	b.ReportAllocs()
+}
+
+type TestRangeValidation struct {
+	RangeInt     int     `json:"rangeInt" valid:"range~-1:50"`
+	RangeFloat32 float32 `json:"rangeFloat32" valid:"range~9.5:10.5"`
+	RangeUint    uint    `json:"rangeUint" valid:"range~0:10"`
+}
+
+func TestIsRangeValid(t *testing.T) {
+	s := TestRangeValidation{
+		RangeInt:     -1,
+		RangeFloat32: 9.8,
+		RangeUint:    0,
+	}
+	e := ValidateStruct(s)
+	if e != nil {
+		for _, iError := range e.GetDetails() {
+			er := iError.(*PortError)
+			t.Log(er.Name, er.Message)
+		}
+		t.Fatal(e)
+	}
+}
+
+func TestIsRangeInValid(t *testing.T) {
+	s := TestRangeValidation{
+		RangeInt:     70,
+		RangeFloat32: 9,
+		RangeUint:    12,
+	}
+	e := ValidateStruct(s)
+	if e == nil {
+		t.Fatal("Must be an error")
+	} else {
+		for _, iError := range e.GetDetails() {
+			er := iError.(*PortError)
+			t.Log(er.Name, er.Message)
+		}
+	}
+}
+
+func BenchmarkIsRangeValid(b *testing.B) {
+	s := TestRangeValidation{
+		RangeInt:     22,
+		RangeFloat32: 9.8,
+		RangeUint:    0,
+	}
+	for i := 0; i < b.N; i++ {
+		_ = ValidateStruct(s)
+	}
+	b.ReportAllocs()
+}
+
+func BenchmarkSeveralTag(b *testing.B) {
+	s := TestRangeValidation{
+		RangeInt:     22,
+		RangeFloat32: 9.8,
+		RangeUint:    0,
+	}
+	t := reflect.TypeOf(s)
+	var tag reflect.StructTag
+	for i := 0; i < b.N; i++ {
+		for j := 0; j < t.NumField(); j++ {
+			tag = t.Field(j).Tag
+			_ = tag.Get("valid")
+			_ = tag.Get("json")
+		}
+	}
+	b.ReportAllocs()
+}
+
+type TestReg struct {
+	Name string `json:"name" valid:"rx~^\\d+$;rx~[0-8]+"`
+	//Name string `json:"name"`
+}
+
+func TestIsRegularValid(t *testing.T) {
+	rs := TestReg{
+		Name: "12291",
+	}
+	e := ValidateStruct(rs)
+	if e != nil {
+		t.Fatal(e.GetDetails())
+	}
+
+	v := "1"
+	e = ValidateStruct(v)
+	if e == nil {
+		t.Fatal("must be error& wrong type")
+	}
+}
+
+func BenchmarkIsRegularValid(b *testing.B) {
+	rs := TestReg{
+		Name: "1221",
+	}
+	for i := 0; i < b.N; i++ {
+		_ = ValidateStruct(rs)
 	}
 	b.ReportAllocs()
 }

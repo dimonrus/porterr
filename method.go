@@ -19,6 +19,12 @@ func (e *PortError) GetDetails() []IError {
 	return items
 }
 
+// return origin error
+func (e *PortError) Origin() *PortError {
+	return e
+}
+
+
 // Interface error push detail
 func (e *PortError) PushDetail(code interface{}, name string, message string) IError {
 	e.details = append(e.details, ErrorData{Code: code, Name: name, Message: message})
