@@ -10,9 +10,6 @@ import (
 
 // IsRequiredValid Required validation rule
 func IsRequiredValid(val reflect.Value, args ...string) bool {
-	if len(args) > 0 && args[0] != "true" {
-		return false
-	}
 	if val.Kind() == reflect.Ptr {
 		if val.IsNil() {
 			return false

@@ -447,3 +447,29 @@ func BenchmarkIsRegularValid(b *testing.B) {
 	}
 	b.ReportAllocs()
 }
+
+type TestValidStruct struct {
+	RangeInt *int `json:"rangeInt" valid:"required"`
+}
+
+type WrapStruct struct {
+	*TestValidStruct
+}
+
+func TestVTestValidStruct(t *testing.T) {
+	tag := "required"
+	rules := ParseValidTag(tag)
+	for _, rule := range rules {
+		t.Log("name:", rule.Name)
+		t.Log("arg:", rule.Args)
+		t.Log("####")
+	}
+}
+
+func BenchmarkRequiredTag(b *testing.B) {
+	tag := "required;"
+	for i := 0; i < b.N; i++ {
+		_ = ParseValidTag(tag)
+	}
+	b.ReportAllocs()
+}
