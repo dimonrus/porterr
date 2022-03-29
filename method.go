@@ -12,6 +12,9 @@ func (e *PortError) Error() string {
 
 // Interface error get details
 func (e *PortError) GetDetails() []IError {
+	if e == nil {
+		return nil
+	}
 	var items []IError
 	for i := range e.details {
 		items = append(items, &PortError{httpCode: e.httpCode, ErrorData: ErrorData{Message: e.details[i].Message, Code: e.details[i].Code, Name: e.details[i].Name}})
@@ -60,7 +63,10 @@ func (e *PortError) FlushDetails() IError {
 }
 
 // Return nil when error does not contain details
-func (e *PortError) IfDetails() IError    {
+func (e *PortError) IfDetails() IError {
+	if e == nil {
+		return nil
+	}
 	if len(e.details) > 0 {
 		return e
 	}
