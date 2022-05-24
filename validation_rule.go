@@ -20,7 +20,7 @@ func IsRequiredValid(val reflect.Value, args ...string) bool {
 }
 
 // IsRegularValid check regular expression
-func IsRegularValid (val reflect.Value, args ...string) bool {
+func IsRegularValid(val reflect.Value, args ...string) bool {
 	if len(args) == 0 {
 		return true
 	}
@@ -44,18 +44,18 @@ func IsRegularValid (val reflect.Value, args ...string) bool {
 
 // IsEnumValid In list validation rule
 func IsEnumValid(val reflect.Value, args ...string) bool {
-	if len(args) == 0 {
-		return true
-	}
-	values := strings.Split(args[0], ",")
-	if len(values) == 0 {
+	if len(args) == 0 || val.IsZero() {
 		return true
 	}
 	if val.Kind() == reflect.Ptr {
 		if val.IsNil() {
-			return false
+			return true
 		}
 		val = val.Elem()
+	}
+	values := strings.Split(args[0], ",")
+	if len(values) == 0 {
+		return true
 	}
 	switch val.Kind() {
 	case reflect.String:
@@ -75,7 +75,7 @@ func IsEnumValid(val reflect.Value, args ...string) bool {
 			if err != nil {
 				return false
 			}
-			if math.Abs(v - comp) < 1e-7 {
+			if math.Abs(v-comp) < 1e-7 {
 				return true
 			}
 		}
@@ -126,8 +126,14 @@ func IsEnumValid(val reflect.Value, args ...string) bool {
 
 // IsRangeValid Range list validation rule
 func IsRangeValid(val reflect.Value, args ...string) bool {
-	if len(args) == 0 {
+	if len(args) == 0 || val.IsZero() {
 		return true
+	}
+	if val.Kind() == reflect.Ptr {
+		if val.IsNil() {
+			return true
+		}
+		val = val.Elem()
 	}
 	delim := strings.Index(args[0], ":")
 	if delim < 0 {
@@ -135,12 +141,6 @@ func IsRangeValid(val reflect.Value, args ...string) bool {
 	}
 	left := args[0][:delim]
 	right := args[0][delim+1:]
-	if val.Kind() == reflect.Ptr {
-		if val.IsNil() {
-			return false
-		}
-		val = val.Elem()
-	}
 	switch val.Kind() {
 	case reflect.Float64:
 		fallthrough

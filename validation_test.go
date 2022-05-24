@@ -297,6 +297,17 @@ func TestIsEnumValid(t *testing.T) {
 	}
 }
 
+func TestIsEmptyEnumValid(t *testing.T) {
+	s := TestEnumStruct{}
+	e := ValidateStruct(s)
+	if e != nil {
+		for _, iError := range e.GetDetails() {
+			er := iError.(*PortError)
+			t.Fatal(er.Name, er.Message)
+		}
+	}
+}
+
 func BenchmarkEnumStruct(b *testing.B) {
 	s := TestEnumStruct{Foo: "vad", Number: 0.19, Bar: 2100, PNumber: new(int64)}
 	*s.PNumber = 1001

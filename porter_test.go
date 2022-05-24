@@ -49,7 +49,7 @@ func TestPortError_PopDetail(t *testing.T) {
 	message := "Filed with message"
 	e := New(http.StatusInternalServerError, message)
 	e = e.PushDetail("SOME_CODE", "item", "New detail")
-	e = e.PushDetail(http.StatusBadRequest, "item second", "New detail 2", )
+	e = e.PushDetail(http.StatusBadRequest, "item second", "New detail 2")
 	er := e.PopDetail()
 	if er.Error() != "New detail 2" {
 		t.Fatal("wrong detail message")
@@ -187,17 +187,16 @@ func TestPortError_MergeDetails(t *testing.T) {
 	}
 
 	var e4 IError
-
 	e = e.MergeDetails(e2, e3, e4)
-
-	fmt.Println(len(e.GetDetails()))
+	if len(e.GetDetails()) != 3 {
+		t.Fatal("must be 3")
+	}
 
 	d, err := json.Marshal(e)
 	if err != nil {
 		t.Fatal(err)
 	}
-
-	fmt.Printf("%s", d)
+	t.Log(string(d))
 }
 
 func TestPortError_IfDetails(t *testing.T) {
@@ -212,4 +211,38 @@ func TestPortError_IfDetails(t *testing.T) {
 	if e.IfDetails() != nil {
 		t.Fatal("if detail isn work properly. nil expected")
 	}
+}
+
+func TestHttpValidationError(t *testing.T) {
+	t.Run("classic", func(t *testing.T) {
+		e := HttpValidationError()
+		if e.Error() != "Validation error" {
+			t.Fatal("wrong message")
+		}
+		if e.GetCode() != PortErrorValidation {
+			t.Fatal("wrong code")
+		}
+		if e.GetHTTP() != http.StatusBadRequest {
+			t.Fatal("wrong http code")
+		}
+	})
+	t.Run("conflict", func(t *testing.T) {
+		e := HttpValidationError(PortErrorConflict)
+		if e.Error() != "Validation error" {
+			t.Fatal("wrong message")
+		}
+		if e.GetCode() != PortErrorConflict {
+			t.Fatal("wrong code")
+		}
+		if e.GetHTTP() != http.StatusBadRequest {
+			t.Fatal("wrong http code")
+		}
+	})
+}
+
+func BenchmarkHttpValidationError(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		_ = HttpValidationError(PortErrorConflict)
+	}
+	b.ReportAllocs()
 }

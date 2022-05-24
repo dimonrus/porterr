@@ -27,7 +27,6 @@ func (e *PortError) Origin() *PortError {
 	return e
 }
 
-
 // Interface error push detail
 func (e *PortError) PushDetail(code interface{}, name string, message string) IError {
 	e.details = append(e.details, ErrorData{Code: code, Name: name, Message: message})
@@ -45,7 +44,7 @@ func (e *PortError) PopDetail() IError {
 }
 
 // Merge detail from other errors
-func (e *PortError) MergeDetails(error ... IError) IError {
+func (e *PortError) MergeDetails(error ...IError) IError {
 	for _, v := range error {
 		if v == nil {
 			continue
@@ -98,7 +97,7 @@ func (e *PortError) GetCode() interface{} {
 // New error
 func New(code interface{}, message string) IError {
 	return &PortError{
-		httpCode:http.StatusInternalServerError,
+		httpCode:  http.StatusInternalServerError,
 		ErrorData: ErrorData{Code: code, Message: message},
 	}
 }
@@ -106,7 +105,7 @@ func New(code interface{}, message string) IError {
 // New error
 func NewF(code interface{}, message string, args ...interface{}) IError {
 	return &PortError{
-		httpCode:http.StatusInternalServerError,
+		httpCode:  http.StatusInternalServerError,
 		ErrorData: ErrorData{Code: code, Message: fmt.Sprintf(message, args...)},
 	}
 }
@@ -114,7 +113,7 @@ func NewF(code interface{}, message string, args ...interface{}) IError {
 // New error with name
 func NewWithName(code interface{}, name string, message string) IError {
 	return &PortError{
-		httpCode:http.StatusInternalServerError,
+		httpCode:  http.StatusInternalServerError,
 		ErrorData: ErrorData{Code: code, Name: name, Message: message},
 	}
 }
@@ -122,7 +121,23 @@ func NewWithName(code interface{}, name string, message string) IError {
 // New error with name
 func NewFWithName(code interface{}, name string, message string, args ...interface{}) IError {
 	return &PortError{
-		httpCode:http.StatusInternalServerError,
+		httpCode:  http.StatusInternalServerError,
 		ErrorData: ErrorData{Code: code, Name: name, Message: fmt.Sprintf(message, args...)},
+	}
+}
+
+// HttpValidationError prepare validation error with 400 http code
+func HttpValidationError(args ...string) IError {
+	var code = PortErrorValidation
+	var message = "Validation error"
+	if len(args) > 0 {
+		code = args[0]
+		if len(args) > 1 {
+			message = args[1]
+		}
+	}
+	return &PortError{
+		httpCode:  http.StatusBadRequest,
+		ErrorData: ErrorData{Code: code, Message: message},
 	}
 }
