@@ -3,6 +3,7 @@ package porterr
 import (
 	"reflect"
 	"testing"
+	"time"
 )
 
 type ComplexStruct struct {
@@ -465,6 +466,20 @@ type TestValidStruct struct {
 
 type WrapStruct struct {
 	*TestValidStruct
+	When *time.Time `json:"when"`
+}
+
+func TestWraped(t *testing.T) {
+	now := time.Now()
+	rng := 50
+	s := &WrapStruct{
+		TestValidStruct: &TestValidStruct{RangeInt: &rng},
+		When:            &now,
+	}
+	e := ValidateStruct(s)
+	if e != nil {
+		t.Fatal(e)
+	}
 }
 
 func TestVTestValidStruct(t *testing.T) {
@@ -481,6 +496,19 @@ func BenchmarkRequiredTag(b *testing.B) {
 	tag := "required;"
 	for i := 0; i < b.N; i++ {
 		_ = ParseValidTag(tag)
+	}
+	b.ReportAllocs()
+}
+
+func BenchmarkWrapStruct(b *testing.B) {
+	now := time.Now()
+	rng := 50
+	s := &WrapStruct{
+		TestValidStruct: &TestValidStruct{RangeInt: &rng},
+		When:            &now,
+	}
+	for i := 0; i < b.N; i++ {
+		_ = ValidateStruct(s)
 	}
 	b.ReportAllocs()
 }

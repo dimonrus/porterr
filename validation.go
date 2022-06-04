@@ -1,6 +1,7 @@
 package porterr
 
 import (
+	"fmt"
 	"net/http"
 	"reflect"
 )
@@ -57,7 +58,7 @@ func ValidateStruct(v interface{}) IError {
 	}
 
 	if ve.Kind() != reflect.Struct {
-		e = e.PushDetail(PortErrorParam, "type", "Type struct required. Type " + ve.Kind().String() + " received")
+		e = e.PushDetail(PortErrorParam, "type", "Type struct required. Type "+ve.Kind().String()+" received")
 		return e
 	}
 
@@ -75,7 +76,7 @@ func ValidateStruct(v interface{}) IError {
 			e = e.MergeDetails(ValidateStruct(f.Interface()))
 		case reflect.Ptr:
 			if !f.IsNil() {
-				if f.Elem().Kind() == reflect.Struct {
+				if _, ok := f.Elem().Interface().(fmt.Stringer); f.Elem().Kind() == reflect.Struct && !ok {
 					e = e.MergeDetails(ValidateStruct(f.Interface()))
 				}
 			}
@@ -108,7 +109,7 @@ func ParseValidTag(validTag string) []ValidationRule {
 	var indexStart, i int
 
 	for {
-		if validTag[i] == ';' && result[ruleCount].Name == ""  {
+		if validTag[i] == ';' && result[ruleCount].Name == "" {
 			result[ruleCount].Name = validTag[indexStart:i]
 			ruleCount++
 			indexStart = i + 1
