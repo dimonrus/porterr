@@ -1,8 +1,8 @@
 # PORTABLE ERROR
-Easy to say that your app has an error.
-Easy to say to your client that app has an error
-Easy to define any error in your logic
-Classic error representation
+- Easy to say that your app has an error.
+- Easy to say to your client that app has an error
+- Easy to define any error in your logic
+- Classic error representation
 
 ## How to use
 Simple system error
@@ -11,11 +11,11 @@ e := porterr.New(PortErrorSystem, message)
 ```
 Simple system error with http response code
 ```
-e := porterr.HTTP(http.StatusInternalServerError)
+e := porterr.New(PortErrorSystem, message).HTTP(http.StatusInternalServerError)
 ```
 Error with details
 ```
-e := porterr.New(PortErrorSystem, message).HTTP(http.StatusInternalServerError)
+e := porterr.New(PortErrorSystem, message)
 e = e.PushDetail("DETAIL_CODE", "item", "New detail")
 e = e.PushDetail("COMMAND_CODE", "command", "Is required")
 e = e.PushDetail("COMMAND_CODE", "command", "Some other message")
