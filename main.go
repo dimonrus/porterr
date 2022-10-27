@@ -2,30 +2,48 @@ package porterr
 
 // PortError Portable error
 type PortError struct {
-	httpCode  int         // Http Error code
-	ErrorData             // Error data
-	details   []ErrorData // Error details
+	// Http Error code
+	httpCode int
+	// Error data
+	ErrorData
+	// Error details
+	details []ErrorData
 }
 
 // ErrorData Detailed error
 type ErrorData struct {
-	Message string      // Error message
-	Code    interface{} // Code message
-	Name    string      // Name of detail
+	// Error message
+	Message string
+	// Code message
+	Code interface{}
+	// Name of detail
+	Name string
 }
 
 // IError Common Error Interface
 type IError interface {
-	Code(code interface{}) IError                                    // Set error code
-	Error() string                                                   // Error interface std
-	FlushDetails() IError                                            // Reset all details
-	GetCode() interface{}                                            // Get error code
-	GetDetails() []IError                                            // Get error details
-	GetHTTP() int                                                    // Get http code
-	HTTP(httpCode int) IError                                        // Set HTTP code
-	IfDetails() IError                                               // Return error if error has details else nil
-	MergeDetails(e ...IError) IError                                 // Merge detail to error
-	Origin() *PortError                                              // Get portable error
-	PopDetail() IError                                               // Get detail from
-	PushDetail(code interface{}, name string, message string) IError // Add error detail
+	// Code Set error code
+	Code(code interface{}) IError
+	// Error interface std
+	Error() string
+	// FlushDetails Reset all details
+	FlushDetails() IError
+	// GetCode Get error code
+	GetCode() interface{}
+	// GetDetails Get error details
+	GetDetails() []IError
+	// GetHTTP Get http code
+	GetHTTP() int
+	// HTTP Set HTTP code
+	HTTP(httpCode int) IError
+	// IfDetails Return error if error has details else nil
+	IfDetails() IError
+	// MergeDetails Merge detail to error
+	MergeDetails(e ...IError) IError
+	// Origin Get portable error
+	Origin() *PortError
+	// PopDetail Get detail from
+	PopDetail() IError
+	// PushDetail Add error detail
+	PushDetail(code interface{}, name string, message string) IError
 }

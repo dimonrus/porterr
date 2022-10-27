@@ -33,7 +33,7 @@ var basicValidationRules = map[string]ValidationCallback{
 // Will be used in validation method
 var actualValidationRules map[string]ValidationCallback
 
-// PrepareActualValidationRules func to append basicValidationRules or replace some one rules
+// PrepareActualValidationRules func to append basicValidationRules or replace existing rules
 // customValidationRules If you want to use your own validation rules
 // add the rules in to customValidationRules var
 func PrepareActualValidationRules(customValidationRules map[string]ValidationCallback) {

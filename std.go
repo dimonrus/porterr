@@ -73,30 +73,24 @@ type portErrorJson struct {
 	Data          []errorDataJson `json:"data,omitempty"`
 }
 
-// Std error marshal
+// MarshalJSON Std error marshal
 func (e *PortError) MarshalJSON() ([]byte, error) {
-	// Prepare errors
 	var errors = make([]errorDataJson, len(e.details))
 	for i := range e.details {
 		errors[i].Code = e.details[i].Code
 		errors[i].Name = e.details[i].Name
 		errors[i].Message = e.details[i].Message
 	}
-	// Create object
 	obj := &portErrorJson{errorDataJson: errorDataJson(e.ErrorData), Data: errors}
-
 	return json.Marshal(obj)
 }
 
-// Unmarshal error
+// UnmarshalJSON Unmarshal error
 func (e *PortError) UnmarshalJSON(data []byte) error {
-	// Create object
 	obj := &portErrorJson{}
-
 	if err := json.Unmarshal(data, obj); err != nil {
 		return err
 	}
-
 	//  Convert to origin error
 	e.ErrorData = ErrorData(obj.errorDataJson)
 	e.details = make([]ErrorData, len(obj.Data))
@@ -105,6 +99,5 @@ func (e *PortError) UnmarshalJSON(data []byte) error {
 		e.details[i].Name = obj.Data[i].Name
 		e.details[i].Message = obj.Data[i].Message
 	}
-
 	return nil
 }

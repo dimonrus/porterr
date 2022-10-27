@@ -10,7 +10,7 @@ func (e *PortError) Error() string {
 	return e.ErrorData.Message
 }
 
-// Interface error get details
+// GetDetails Interface error get details
 func (e *PortError) GetDetails() []IError {
 	if e == nil {
 		return nil
@@ -22,18 +22,18 @@ func (e *PortError) GetDetails() []IError {
 	return items
 }
 
-// return origin error
+// Origin return origin error
 func (e *PortError) Origin() *PortError {
 	return e
 }
 
-// Interface error push detail
+// PushDetail Interface error push detail
 func (e *PortError) PushDetail(code interface{}, name string, message string) IError {
 	e.details = append(e.details, ErrorData{Code: code, Name: name, Message: message})
 	return e
 }
 
-// Pop detail
+// PopDetail Pop detail
 func (e *PortError) PopDetail() IError {
 	if len(e.details) > 0 {
 		var item *ErrorData
@@ -43,7 +43,7 @@ func (e *PortError) PopDetail() IError {
 	return nil
 }
 
-// Merge detail from other errors
+// MergeDetails Merge detail from other errors
 func (e *PortError) MergeDetails(error ...IError) IError {
 	for _, v := range error {
 		if v == nil {
@@ -55,13 +55,13 @@ func (e *PortError) MergeDetails(error ...IError) IError {
 	return e
 }
 
-// Flush detail
+// FlushDetails Flush detail
 func (e *PortError) FlushDetails() IError {
-	e.details = make([]ErrorData, 0)
+	e.details = e.details[:0]
 	return e
 }
 
-// Return nil when error does not contain details
+// IfDetails Return nil when error does not contain details
 func (e *PortError) IfDetails() IError {
 	if e == nil {
 		return nil
@@ -72,24 +72,24 @@ func (e *PortError) IfDetails() IError {
 	return nil
 }
 
-// Set HTTP
+// HTTP Set HTTP
 func (e *PortError) HTTP(httpCode int) IError {
 	e.httpCode = httpCode
 	return e
 }
 
-// Get HTTP Code
+// GetHTTP Get HTTP Code
 func (e *PortError) GetHTTP() int {
 	return e.httpCode
 }
 
-// Set Error Code
+// Code Set Error Code
 func (e *PortError) Code(code interface{}) IError {
 	e.ErrorData.Code = code
 	return e
 }
 
-// Get Error Code
+// GetCode Get Error Code
 func (e *PortError) GetCode() interface{} {
 	return e.ErrorData.Code
 }
@@ -102,7 +102,7 @@ func New(code interface{}, message string) IError {
 	}
 }
 
-// New error
+// NewF error
 func NewF(code interface{}, message string, args ...interface{}) IError {
 	return &PortError{
 		httpCode:  http.StatusInternalServerError,
@@ -110,7 +110,7 @@ func NewF(code interface{}, message string, args ...interface{}) IError {
 	}
 }
 
-// New error with name
+// NewWithName error with name
 func NewWithName(code interface{}, name string, message string) IError {
 	return &PortError{
 		httpCode:  http.StatusInternalServerError,
@@ -118,7 +118,7 @@ func NewWithName(code interface{}, name string, message string) IError {
 	}
 }
 
-// New error with name
+// NewFWithName error with name format
 func NewFWithName(code interface{}, name string, message string, args ...interface{}) IError {
 	return &PortError{
 		httpCode:  http.StatusInternalServerError,
