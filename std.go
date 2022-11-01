@@ -1,6 +1,8 @@
 package porterr
 
-import "encoding/json"
+import (
+	"encoding/json"
+)
 
 const (
 	PortErrorSystem        = "PORTABLE_ERROR_SYSTEM"
@@ -62,9 +64,9 @@ const (
 )
 
 type errorDataJson struct {
-	Message string      `json:"message,omitempty"`
 	Code    interface{} `json:"code"`
 	Name    string      `json:"name,omitempty"`
+	Message string      `json:"message,omitempty"`
 }
 
 // Portable error

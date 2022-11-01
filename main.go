@@ -12,12 +12,12 @@ type PortError struct {
 
 // ErrorData Detailed error
 type ErrorData struct {
-	// Error message
-	Message string
 	// Code message
 	Code interface{}
 	// Name of detail
 	Name string
+	// Error message
+	Message string
 }
 
 // IError Common Error Interface
