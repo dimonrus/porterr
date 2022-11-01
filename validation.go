@@ -28,6 +28,10 @@ var basicValidationRules = map[string]ValidationCallback{
 	"range": IsRangeValid,
 	// Regular expression validation
 	"rx": IsRegularValid,
+	// Check if value or length <= min
+	"min": IsMinValid,
+	// Check if value or length >= max
+	"max": IsMaxValid,
 }
 
 // Will be used in validation method

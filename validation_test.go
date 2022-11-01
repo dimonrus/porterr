@@ -512,3 +512,157 @@ func BenchmarkWrapStruct(b *testing.B) {
 	}
 	b.ReportAllocs()
 }
+
+func TestIsMinValid(t *testing.T) {
+	t.Run("min_error_expected", func(t *testing.T) {
+		minErr := struct {
+			Min string `valid:"min~5"`
+		}{Min: "some"}
+		e := ValidateStruct(&minErr)
+		if e == nil {
+			t.Fatal("min error expected")
+		} else {
+			t.Log(e.GetDetails())
+		}
+	})
+	t.Run("not_min_error", func(t *testing.T) {
+		minErr := struct {
+			Min string `valid:"min~5"`
+		}{Min: "something"}
+		e := ValidateStruct(&minErr)
+		if e != nil {
+			t.Fatal("min error unexpected")
+		}
+	})
+	t.Run("not_min_error_float", func(t *testing.T) {
+		minErr := struct {
+			Min float64 `valid:"min~5"`
+		}{Min: 5.01}
+		e := ValidateStruct(&minErr)
+		if e != nil {
+			t.Fatal("min error unexpected float")
+		}
+	})
+	t.Run("min_error_float", func(t *testing.T) {
+		minErr := struct {
+			Min float64 `valid:"min~5"`
+		}{Min: 4.01}
+		e := ValidateStruct(&minErr)
+		if e == nil {
+			t.Fatal("min error expected float")
+		}
+	})
+	t.Run("not_min_error_int", func(t *testing.T) {
+		minErr := struct {
+			Min int32 `valid:"min~5"`
+		}{Min: 5}
+		e := ValidateStruct(&minErr)
+		if e != nil {
+			t.Fatal("min error unexpected int")
+		}
+	})
+	t.Run("min_error_int", func(t *testing.T) {
+		minErr := struct {
+			Min float64 `valid:"min~5"`
+		}{Min: 4}
+		e := ValidateStruct(&minErr)
+		if e == nil {
+			t.Fatal("min error expected int")
+		}
+	})
+	t.Run("not_min_error_uint", func(t *testing.T) {
+		minErr := struct {
+			Min uint `valid:"min~5"`
+		}{Min: 5}
+		e := ValidateStruct(&minErr)
+		if e != nil {
+			t.Fatal("min error unexpected uint")
+		}
+	})
+	t.Run("min_error_uint", func(t *testing.T) {
+		minErr := struct {
+			Min uint `valid:"min~5"`
+		}{Min: 4}
+		e := ValidateStruct(&minErr)
+		if e == nil {
+			t.Fatal("min error expected uint")
+		}
+	})
+}
+
+func TestIsMaxValid(t *testing.T) {
+	t.Run("max_error_expected", func(t *testing.T) {
+		maxErr := struct {
+			Max string `valid:"max~4"`
+		}{Max: "something"}
+		e := ValidateStruct(&maxErr)
+		if e == nil {
+			t.Fatal("max error expected")
+		} else {
+			t.Log(e.GetDetails())
+		}
+	})
+	t.Run("not_max_error", func(t *testing.T) {
+		maxErr := struct {
+			Min string `valid:"max~5"`
+		}{Min: "thing"}
+		e := ValidateStruct(&maxErr)
+		if e != nil {
+			t.Fatal("max error unexpected")
+		}
+	})
+	t.Run("not_max_error_float", func(t *testing.T) {
+		maxErr := struct {
+			Max float64 `valid:"max~6"`
+		}{Max: 5.01}
+		e := ValidateStruct(&maxErr)
+		if e != nil {
+			t.Fatal("max error unexpected float")
+		}
+	})
+	t.Run("max_error_float", func(t *testing.T) {
+		maxErr := struct {
+			Max float64 `valid:"max~5"`
+		}{Max: 5.01}
+		e := ValidateStruct(&maxErr)
+		if e == nil {
+			t.Fatal("max error expected float")
+		}
+	})
+	t.Run("not_max_error_int", func(t *testing.T) {
+		maxErr := struct {
+			Max int32 `valid:"max~5"`
+		}{Max: 5}
+		e := ValidateStruct(&maxErr)
+		if e != nil {
+			t.Fatal("max error unexpected int")
+		}
+	})
+	t.Run("max_error_int", func(t *testing.T) {
+		maxErr := struct {
+			Max float64 `valid:"max~5"`
+		}{Max: 6}
+		e := ValidateStruct(&maxErr)
+		if e == nil {
+			t.Fatal("max error expected int")
+		}
+	})
+	t.Run("not_max_error_uint", func(t *testing.T) {
+		maxErr := struct {
+			Max uint `valid:"max~5"`
+		}{Max: 5}
+		e := ValidateStruct(&maxErr)
+		if e != nil {
+			t.Fatal("max error unexpected uint")
+		}
+	})
+	t.Run("max_error_uint", func(t *testing.T) {
+		maxErr := struct {
+			Max uint `valid:"max~5"`
+		}{Max: 6}
+		e := ValidateStruct(&maxErr)
+		if e == nil {
+			t.Fatal("max error expected uint")
+		}
+	})
+}

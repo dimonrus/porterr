@@ -205,3 +205,101 @@ func IsRangeValid(val reflect.Value, args ...string) bool {
 	}
 	return true
 }
+
+// IsMinValid check min
+func IsMinValid(val reflect.Value, args ...string) bool {
+	if len(args) == 0 {
+		return true
+	}
+	if val.Kind() == reflect.Ptr {
+		if val.IsNil() {
+			return false
+		}
+		val = val.Elem()
+	}
+	if len(args) == 0 {
+		return true
+	}
+	min, err := strconv.Atoi(args[0])
+	if err != nil {
+		return false
+	}
+	switch val.Kind() {
+	case reflect.String:
+		return len([]rune(val.String())) >= min
+	case reflect.Float64:
+		fallthrough
+	case reflect.Float32:
+		return val.Float() >= float64(min)
+	case reflect.Int:
+		fallthrough
+	case reflect.Int8:
+		fallthrough
+	case reflect.Int16:
+		fallthrough
+	case reflect.Int32:
+		fallthrough
+	case reflect.Int64:
+		return val.Int() >= int64(min)
+	case reflect.Uint:
+		fallthrough
+	case reflect.Uint8:
+		fallthrough
+	case reflect.Uint16:
+		fallthrough
+	case reflect.Uint32:
+		fallthrough
+	case reflect.Uint64:
+		return val.Uint() >= uint64(min)
+	}
+	return true
+}
+
+// IsMaxValid check max
+func IsMaxValid(val reflect.Value, args ...string) bool {
+	if len(args) == 0 {
+		return true
+	}
+	if val.Kind() == reflect.Ptr {
+		if val.IsNil() {
+			return false
+		}
+		val = val.Elem()
+	}
+	if len(args) == 0 {
+		return true
+	}
+	max, err := strconv.Atoi(args[0])
+	if err != nil {
+		return false
+	}
+	switch val.Kind() {
+	case reflect.String:
+		return len([]rune(val.String())) <= max
+	case reflect.Float64:
+		fallthrough
+	case reflect.Float32:
+		return val.Float() <= float64(max)
+	case reflect.Int:
+		fallthrough
+	case reflect.Int8:
+		fallthrough
+	case reflect.Int16:
+		fallthrough
+	case reflect.Int32:
+		fallthrough
+	case reflect.Int64:
+		return val.Int() <= int64(max)
+	case reflect.Uint:
+		fallthrough
+	case reflect.Uint8:
+		fallthrough
+	case reflect.Uint16:
+		fallthrough
+	case reflect.Uint32:
+		fallthrough
+	case reflect.Uint64:
+		return val.Uint() <= uint64(max)
+	}
+	return true
+}

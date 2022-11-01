@@ -99,7 +99,9 @@ func TestPortError_MarshalJSON(t *testing.T) {
 		t.Fatal("Marshal error")
 	}
 
-	if fmt.Sprintf("%s", data) != `{"message":"Filed with message","code":"PORTABLE_ERROR_SYSTEM","data":[{"message":"New detail","code":"SOME_CODE","name":"item"},{"code":400,"name":"item second"}]}` {
+	t.Log(string(data))
+
+	if fmt.Sprintf("%s", data) != `{"code":"PORTABLE_ERROR_SYSTEM","message":"Filed with message","data":[{"code":"SOME_CODE","name":"item","message":"New detail"},{"code":400,"name":"item second"}]}` {
 		t.Fatal("wrong marshal")
 	}
 
