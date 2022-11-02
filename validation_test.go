@@ -666,3 +666,92 @@ func TestIsMaxValid(t *testing.T) {
 		}
 	})
 }
+
+func TestIsDigits(t *testing.T) {
+	t.Run("digits_string_ok", func(t *testing.T) {
+		st := struct {
+			Value string `valid:"digit"`
+		}{Value: "1234567890"}
+		e := ValidateStruct(&st)
+		if e != nil {
+			t.Fatal("digits_string_ok")
+		}
+	})
+	t.Run("digits_string_nok", func(t *testing.T) {
+		st := struct {
+			Value string `valid:"digit"`
+		}{Value: "1234567890a"}
+		e := ValidateStruct(&st)
+		if e == nil {
+			t.Fatal("digits_string_nok")
+		}
+	})
+	t.Run("digits_string_ok_len", func(t *testing.T) {
+		st := struct {
+			Value string `valid:"digit~5,10"`
+		}{Value: "1234567890"}
+		e := ValidateStruct(&st)
+		if e != nil {
+			t.Fatal("digits_string_ok")
+		}
+		st = struct {
+			Value string `valid:"digit~5,10"`
+		}{Value: "12345"}
+		e = ValidateStruct(&st)
+		if e != nil {
+			t.Fatal("digits_string_ok")
+		}
+	})
+	t.Run("digits_string_nok_len", func(t *testing.T) {
+		st := struct {
+			Value string `valid:"digit~5,10"`
+		}{Value: "123456789"}
+		e := ValidateStruct(&st)
+		if e == nil {
+			t.Fatal("digits_string_nok_len")
+		}
+		st = struct {
+			Value string `valid:"digit~5,10"`
+		}{Value: "1234v"}
+		e = ValidateStruct(&st)
+		if e != nil {
+			t.Fatal("digits_string_nok_len")
+		}
+	})
+	t.Run("digits_int_ok", func(t *testing.T) {
+		st := struct {
+			Value int `valid:"digit"`
+		}{Value: 9100001111}
+		e := ValidateStruct(&st)
+		if e != nil {
+			t.Fatal("digits_int_ok")
+		}
+	})
+	t.Run("digits_int_nok", func(t *testing.T) {
+		st := struct {
+			Value int `valid:"digit~9"`
+		}{Value: 9100001111}
+		e := ValidateStruct(&st)
+		if e == nil {
+			t.Fatal("digits_int_nok")
+		}
+	})
+	t.Run("digits_uint_ok", func(t *testing.T) {
+		st := struct {
+			Value uint `valid:"digit~4"`
+		}{Value: 1223}
+		e := ValidateStruct(&st)
+		if e != nil {
+			t.Fatal("digits_uint_ok")
+		}
+	})
+	t.Run("digits_uint_nok", func(t *testing.T) {
+		st := struct {
+			Value uint `valid:"digit~3"`
+		}{Value: 1123}
+		e := ValidateStruct(&st)
+		if e == nil {
+			t.Fatal("digits_uint_nok")
+		}
+	})
+}

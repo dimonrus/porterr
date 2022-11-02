@@ -36,8 +36,11 @@ Possible rules as parts of 'valid' tag:
 - exp. Regular expression
 - range. Range if values
 - enum. Predefined enum
+- min. Minimum value or length
+- max. Maximum value or length
+- digit. Only digits in value. Can specify length
 
-Example: `valid:"required;exp~[0-5]+;range~1:50;enum~[5,10,15,20,25]"`
+Example: `valid:"required;exp~[0-5]+;range~1:50;enum~[5,10,15,20,25];digit~4,10;min~3;max~10"`
 ```
 type ComplexStruct struct {
 	Cool bool

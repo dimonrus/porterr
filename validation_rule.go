@@ -303,3 +303,64 @@ func IsMaxValid(val reflect.Value, args ...string) bool {
 	}
 	return true
 }
+
+// IsDigits check for digits
+func IsDigits(val reflect.Value, args ...string) bool {
+	if val.IsZero() {
+		return true
+	}
+	if val.Kind() == reflect.Ptr {
+		if val.IsNil() {
+			return true
+		}
+		val = val.Elem()
+	}
+	var value string
+	switch val.Kind() {
+	case reflect.String:
+		value = val.String()
+	case reflect.Int:
+		fallthrough
+	case reflect.Int8:
+		fallthrough
+	case reflect.Int16:
+		fallthrough
+	case reflect.Int32:
+		fallthrough
+	case reflect.Int64:
+		value = strconv.FormatInt(val.Int(), 10)
+	case reflect.Uint:
+		fallthrough
+	case reflect.Uint8:
+		fallthrough
+	case reflect.Uint16:
+		fallthrough
+	case reflect.Uint32:
+		fallthrough
+	case reflect.Uint64:
+		value = strconv.FormatUint(val.Uint(), 10)
+	}
+
+	runes := []rune(value)
+	lr := len(runes)
+	var l int
+	for _, s := range runes {
+		if s >= '0' && s <= '9' {
+			l++
+		}
+	}
+	if len(args) > 0 {
+		lengths := strings.Split(args[0], ",")
+		if len(lengths) == 0 && lr == l {
+			return true
+		}
+		for _, length := range lengths {
+			ll, _ := strconv.Atoi(length)
+			if ll == lr {
+				return true
+			}
+		}
+		return false
+	}
+	return lr == l
+}

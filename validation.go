@@ -32,6 +32,8 @@ var basicValidationRules = map[string]ValidationCallback{
 	"min": IsMinValid,
 	// Check if value or length >= max
 	"max": IsMaxValid,
+	// check for digits. can specify len
+	"digit": IsDigits,
 }
 
 // Will be used in validation method
