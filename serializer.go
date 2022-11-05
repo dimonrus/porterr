@@ -50,12 +50,8 @@ func (e ErrorData) Serial(buf *bytes.Buffer) {
 	case uint64:
 		buf.WriteString(strconv.FormatInt(int64(v), 10))
 	}
-	if len(e.Name) > 0 {
-		buf.WriteString("|" + e.Name)
-	}
-	if len(e.Message) > 0 {
-		buf.WriteString("|" + e.Message)
-	}
+	buf.WriteString("|" + e.Name)
+	buf.WriteString("|" + e.Message)
 	return
 }
 
