@@ -24,8 +24,8 @@ var (
 	PackErrorPrefix = []byte{120, 101, 58, 112, 101, 58}
 )
 
-// Pack error
-func (e ErrorData) Pack(buf *bytes.Buffer) {
+// Serial error
+func (e ErrorData) Serial(buf *bytes.Buffer) {
 	switch v := e.Code.(type) {
 	case string:
 		buf.WriteString(v)
@@ -66,11 +66,11 @@ func (e *PortError) Pack(b *bytes.Buffer) {
 	// next 2 byte is length of all error
 	b.Write([]byte{0, 0})
 	// pack error
-	e.ErrorData.Pack(b)
+	e.ErrorData.Serial(b)
 	// pack details
 	for _, detail := range e.details {
 		b.WriteByte(PackControlSymbolTilda)
-		detail.Pack(b)
+		detail.Serial(b)
 	}
 	// append http code
 	b.WriteByte(PackControlSymbolTilda)

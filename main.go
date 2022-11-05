@@ -1,5 +1,7 @@
 package porterr
 
+import "bytes"
+
 // PortError Portable error
 type PortError struct {
 	// Http Error code
@@ -42,6 +44,8 @@ type IError interface {
 	MergeDetails(e ...IError) IError
 	// Origin Get portable error
 	Origin() *PortError
+	// Pack error
+	Pack(b *bytes.Buffer)
 	// PopDetail Get detail from
 	PopDetail() IError
 	// PushDetail Add error detail
