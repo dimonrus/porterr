@@ -1,4 +1,4 @@
-package pe
+package porterr
 
 import (
 	"encoding/json"
