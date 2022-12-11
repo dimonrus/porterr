@@ -1,7 +1,8 @@
-package porterr
+package pe
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"net/http"
 	"reflect"
@@ -86,6 +87,71 @@ func TestPortError_FlushDetails(t *testing.T) {
 	if len(e.GetDetails()) != 0 {
 		t.Fatal("Flush is not works")
 	}
+}
+
+func TestIsPortError(t *testing.T) {
+	t.Run("single_detail_is_ok", func(t *testing.T) {
+		e := New(PortErrorSystem, "some error")
+		detail := NewWithName(PortErrorDatabaseQuery, "db", "Database error")
+		e = e.AsDetails(detail)
+		if !errors.Is(e.PopDetail(), detail) {
+			t.Fatal("single_detail_is_ok")
+		}
+	})
+	t.Run("single_detail_is_nok", func(t *testing.T) {
+		detail := NewWithName(PortErrorDatabaseQuery, "db", "Database error")
+		detail2 := NewWithName(PortErrorSystem, "db", "Database error")
+		if errors.Is(detail, detail2) {
+			t.Fatal("single_detail_is_nok")
+		}
+	})
+	t.Run("multiple_detail_is_ok", func(t *testing.T) {
+		detailFirst := NewWithName(PortErrorDatabaseQuery, "db", "Database error")
+		detailSecond := NewWithName(PortErrorTransaction, "db", "Transaction error")
+
+		e := New(PortErrorSearch, "some error").HTTP(http.StatusTooManyRequests)
+		e = e.AsDetails(detailFirst)
+		e = e.AsDetails(detailSecond)
+
+		e2 := New(PortErrorSearch, "some error").HTTP(http.StatusTooManyRequests)
+		e2 = e2.AsDetails(detailFirst)
+		e2 = e2.AsDetails(detailSecond)
+
+		if !errors.Is(e, e2) {
+			t.Fatal("multiple_detail_is_ok")
+		}
+	})
+	t.Run("multiple_detail_is_nok", func(t *testing.T) {
+		detailFirst := NewWithName(PortErrorDatabaseQuery, "db", "Database error")
+		detailSecond := NewWithName(PortErrorTransaction, "db", "Transaction error")
+
+		e := New(PortErrorSearch, "some error").HTTP(http.StatusTooManyRequests)
+		e = e.AsDetails(detailFirst)
+		e = e.AsDetails(detailSecond)
+
+		e2 := New(PortErrorSearch, "some error").HTTP(http.StatusTooManyRequests)
+		e2 = e2.AsDetails(detailFirst)
+
+		if errors.Is(e, e2) {
+			t.Fatal("multiple_detail_is_nok")
+		}
+	})
+}
+
+// goos: darwin
+// goarch: amd64
+// pkg: github.com/dimonrus/porterr
+// cpu: Intel(R) Core(TM) i5-8279U CPU @ 2.40GHz
+// BenchmarkPortError_Is
+// BenchmarkPortError_Is-8   	63456648	        18.55 ns/op	       0 B/op	       0 allocs/op
+func BenchmarkPortError_Is(b *testing.B) {
+	e := New(PortErrorSystem, "some error")
+	detail := NewWithName(PortErrorDatabaseQuery, "db", "Database error")
+	e = e.AsDetails(detail)
+	for i := 0; i < b.N; i++ {
+		errors.Is(e.PopDetail(), detail)
+	}
+	b.ReportAllocs()
 }
 
 func TestPortError_MarshalJSON(t *testing.T) {

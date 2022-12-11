@@ -1,4 +1,4 @@
-package porterr
+package pe
 
 import (
 	"fmt"
@@ -49,10 +49,58 @@ func (e *PortError) MergeDetails(error ...IError) IError {
 		if v == nil {
 			continue
 		}
-		detail := v.(*PortError)
-		e.details = append(e.details, detail.details...)
+		if pe, ok := v.(*PortError); ok {
+			e.details = append(e.details, pe.details...)
+		}
 	}
 	return e
+}
+
+// AsDetails append to details list of IError
+func (e *PortError) AsDetails(error ...IError) IError {
+	for _, iError := range error {
+		if pe, ok := iError.(*PortError); ok {
+			e.details = append(e.details, pe.ErrorData)
+		}
+	}
+	return e
+}
+
+// Is check is IError is same as origin
+func (e *PortError) Is(err error) bool {
+	pe, ok := err.(*PortError)
+	if !ok {
+		return false
+	}
+	if pe.httpCode != 0 && e.httpCode != 0 {
+		if pe.httpCode != e.httpCode {
+			return false
+		}
+	}
+	if len(pe.details) != len(e.details) {
+		return false
+	}
+	if pe.Name != e.Name {
+		return false
+	}
+	if pe.Message != e.Message {
+		return false
+	}
+	if pe.ErrorData.Code != e.ErrorData.Code {
+		return false
+	}
+	for i := range pe.details {
+		if pe.details[i].Name != e.details[i].Name {
+			return false
+		}
+		if pe.details[i].Message != e.details[i].Message {
+			return false
+		}
+		if pe.details[i].Code != e.details[i].Code {
+			return false
+		}
+	}
+	return true
 }
 
 // FlushDetails Flush detail

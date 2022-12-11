@@ -1,4 +1,4 @@
-package porterr
+package pe
 
 // PortError Portable error
 type PortError struct {
@@ -40,6 +40,8 @@ type IError interface {
 	IfDetails() IError
 	// MergeDetails Merge detail to error
 	MergeDetails(e ...IError) IError
+	// AsDetails append to details list of IErrors
+	AsDetails(e ...IError) IError
 	// Origin Get portable error
 	Origin() *PortError
 	// PopDetail Get detail from

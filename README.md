@@ -3,6 +3,7 @@
 - Easy to say to your client that app has an error
 - Easy to define any error in your logic
 - Classic error representation
+- Supports errors.Is for IError type
 
 ## How to use
 Simple system error

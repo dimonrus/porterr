@@ -1,4 +1,4 @@
-package porterr
+package pe
 
 import (
 	"bytes"
