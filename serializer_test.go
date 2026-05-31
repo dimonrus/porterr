@@ -2,6 +2,7 @@ package porterr
 
 import (
 	"bytes"
+	"encoding/binary"
 	"encoding/json"
 	"net/http"
 	"testing"
@@ -94,4 +95,14 @@ func BenchmarkPackSize(b *testing.B) {
 		e.Origin().Pack(bt)
 	}
 	b.ReportAllocs()
+}
+
+func TestOverflow(t *testing.T) {
+	a := 13312
+	bb := make([]byte, 2)
+	bb[0] = byte(a >> 8 & 0xff)
+	bb[1] = byte(a & 0xff)
+	if int(binary.BigEndian.Uint16(bb)) != a {
+		t.Fatal()
+	}
 }

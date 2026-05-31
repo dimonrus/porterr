@@ -3,6 +3,7 @@ package porterr
 import (
 	"bytes"
 	"encoding/binary"
+	"math"
 	"reflect"
 	"strconv"
 	"unsafe"
@@ -40,7 +41,11 @@ func (e ErrorData) Serial(buf *bytes.Buffer) {
 	case int64:
 		buf.WriteString(strconv.FormatInt(v, 10))
 	case uint:
-		buf.WriteString(strconv.FormatInt(int64(v), 10))
+		if v > math.MaxInt64 {
+			buf.WriteString(strconv.FormatInt(math.MinInt64, 10))
+		} else {
+			buf.WriteString(strconv.FormatInt(int64(v), 10))
+		}
 	case uint8:
 		buf.WriteString(strconv.FormatInt(int64(v), 10))
 	case uint16:
@@ -48,7 +53,11 @@ func (e ErrorData) Serial(buf *bytes.Buffer) {
 	case uint32:
 		buf.WriteString(strconv.FormatInt(int64(v), 10))
 	case uint64:
-		buf.WriteString(strconv.FormatInt(int64(v), 10))
+		if v > math.MaxInt64 {
+			buf.WriteString(strconv.FormatInt(math.MinInt64, 10))
+		} else {
+			buf.WriteString(strconv.FormatInt(int64(v), 10))
+		}
 	}
 	buf.WriteString("|" + e.Name)
 	buf.WriteString("|" + e.Message)
@@ -70,14 +79,14 @@ func (e *PortError) Pack(b *bytes.Buffer) {
 	}
 	// append http code
 	b.WriteByte(PackControlSymbolTilda)
-	b.WriteByte(byte(e.httpCode >> 8))
-	b.WriteByte(byte(e.httpCode))
+	b.WriteByte(byte(e.httpCode >> 8 & 0xff))
+	b.WriteByte(byte(e.httpCode & 0xff))
 	// collect length
 	data := b.Bytes()
 	errorLen := b.Len() - 8
 	// set length into data
-	data[6] = byte(errorLen >> 8)
-	data[7] = byte(errorLen)
+	data[6] = byte(errorLen >> 8 & 0xff)
+	data[7] = byte(errorLen & 0xff)
 	return
 }
 
@@ -103,7 +112,9 @@ func packDetailLen(data []byte) int {
 }
 
 func injectInString(s *string, data []byte) {
+	// #nosec G103
 	pSlice := (*reflect.SliceHeader)(unsafe.Pointer(&data))
+	// #nosec G103
 	pString := (*reflect.StringHeader)(unsafe.Pointer(s))
 	pString.Data = pSlice.Data
 	pString.Len = pSlice.Len
